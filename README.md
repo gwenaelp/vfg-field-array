@@ -17,7 +17,7 @@
 
 ### Simple array
 
-![Simple](https://github.com/gwenaelp/vfg-field-object/blob/master/docs/preview-simple.png)
+![Simple](https://github.com/gwenaelp/vfg-field-array/blob/master/docs/preview-simple.png)
 
 ```
 {
@@ -39,7 +39,7 @@
 
 ### With container component
 
-![With container](https://github.com/gwenaelp/vfg-field-object/blob/master/docs/preview-container.png)
+![With container](https://github.com/gwenaelp/vfg-field-array/blob/master/docs/preview-container.png)
 
 ```
 {
@@ -98,7 +98,7 @@
 
 ### With container component and object as array item
 
-![With container and object](https://github.com/gwenaelp/vfg-field-object/blob/master/docs/preview-container-object.png)
+![With container and object](https://github.com/gwenaelp/vfg-field-array/blob/master/docs/preview-container-object.png)
 
 ```
 {
