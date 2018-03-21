@@ -217,11 +217,20 @@ Vue.use(ModuleLibrary);
 <!-- Components are registered globally -->
 ```
 
-### After that, you can use it in your templates:
+### After that, you can use it with Vue Form Generator:
 
-```html
-<field-array></field-array>
+```json
+  schema: {
+    fields: [
+      {
+        type: "array",
+        label: "My array",
+        model: "myArray"
+      }
+    ]
+  }
 ```
+
 
 ## Changelog
 
