@@ -1,11 +1,20 @@
 <template>
-  <div :id="getFieldID(schema)" :class="schema.fieldClasses" v-if="schema">
-    <div v-for="(item, index) in value">
+  <div :id="fieldId" :class="schema.fieldClasses" v-if="schema">
+    <div v-for="(item, index) in value" :class="schema.itemContainerClasses">
       <span v-if="schema.items && schema.itemContainerComponent">
         <component
           :is='schema.itemContainerComponent'
           :model='item'
+          :index="index"
+          :id="fieldId + 'c' + index"
+          :parentId="fieldId"
+          :removeElementButtonLabel="removeElementButtonLabel"
+          :moveElementUpButtonLabel="moveElementUpButtonLabel"
+          :moveElementDownButtonLabel="moveElementDownButtonLabel"
+          :itemContainerHeader="schema.itemContainerHeader"
           :schema='generateSchema(value, schema.items, index)'
+          @moveItemUp="moveElementUp(index)"
+          @moveItemDown="moveElementDown(index)"
           @removeItem='removeElement(index)'>
           <component
             :is='getFieldType(schema.items)'
@@ -27,9 +36,18 @@
         <component
           :is='schema.itemContainerComponent'
           :model='item'
+          :index="index"
+          :id="fieldId + 'c' + index"
+          :parentId="fieldId"
+          :removeElementButtonLabel="removeElementButtonLabel"
+          :moveElementUpButtonLabel="moveElementUpButtonLabel"
+          :moveElementDownButtonLabel="moveElementDownButtonLabel"
+          :itemContainerHeader="schema.itemContainerHeader"
           :schema='generateSchema(value, schema.items, index)'
+          @moveItemUp="moveElementUp(index)"
+          @moveItemDown="moveElementDown(index)"
           @removeItem='removeElement(index)'>
-          <input type="text" v-model="value[index]"/>
+          <input type="text" v-model="value[index]" :class="schema.itemFieldClasses" :name='generateInputName(index)' :id="fieldId + index" />
           <input
             type="button"
             :value="removeElementButtonLabel"
@@ -37,10 +55,23 @@
             v-if='schema.showRemoveButton'/>
         </component>
       </span>
-      <input type="text" v-model="value[index]" v-else/>
+      <input type="text" v-model="value[index]" :class="schema.itemFieldClasses" :name='generateInputName(index)' :id="fieldId + index" v-else/>
+      <input
+        type="button"
+        :value="moveElementUpButtonLabel"
+        :class="schema.moveElementUpButtonClasses"
+        @click="moveElementUp(index)"
+        v-if='schema.showModeElementUpButton'/>
+      <input
+        type="button"
+        :value="moveElementDownButtonLabel"
+        :class="schema.moveElementDownButtonClasses"
+        @click="moveElementDown(index)"
+        v-if='schema.showModeElementDownButton'/>
       <input
         type="button"
         :value="removeElementButtonLabel"
+        :class="schema.removeElementButtonClasses"
         @click="removeElement(index)"
         v-if='schema.showRemoveButton'/>
     </div>
@@ -50,24 +81,52 @@
 
 <script>
   import VueFormGenerator from "vue-form-generator";
-  import { forEach } from "lodash";
+  import { forEach, cloneDeep, get as objGet, isFunction, isArray, isString } from "lodash";
   import Vue from "vue";
 
   export default {
-    props: {
-      newElementButtonLabel: {
-        type: String,
-        default: "+ New"
-      },
-      removeElementButtonLabel: {
-        type: String,
-        default: "x"
-      }
-    },
     mixins: [VueFormGenerator.abstractField],
+    computed: {
+       fieldId() {
+         return this.getFieldID(this.schema);
+       },
+       newElementButtonLabel() {
+         if(typeof this.schema.newElementButtonLabel !== "undefined") {
+           return this.schema.newElementButtonLabel;
+         }
 
+         return "+ New";
+       },
+       removeElementButtonLabel() {
+         if(typeof this.schema.removeElementButtonLabel !== "undefined") {
+           return this.schema.removeElementButtonLabel;
+         }
+
+         return "x";
+       },
+       moveElementUpButtonLabel() {
+         if(typeof this.schema.moveElementUpButtonLabel !== "undefined") {removeElementButtonLabel()
+           return this.schema.moveElementUpButtonLabel;
+         }
+
+         return "↑";
+       },
+       moveElementDownButtonLabel() {
+         if(typeof this.schema.moveElementDownButtonLabel !== "undefined") {
+           return this.schema.moveElementDownButtonLabel;
+         }
+
+         return "↓";
+       }
+    },
     methods: {
       generateSchema(rootValue, schema, index) {
+        if(typeof this.schema.inputName !== "undefined") {
+          schema.inputName = this.schema.inputName + "[" + index + "]";
+        }
+
+        schema.id = this.fieldId + index;
+
         return {
           ...schema,
           set(model, value) {
@@ -78,7 +137,13 @@
           }
         };
       },
+      generateInputName(index){
+          if(typeof this.schema.inputName === "undefined") {
+            return null;
+          }
 
+          return this.schema.inputName + "[" + index + "]";
+      },
       newElement() {
         let value = this.value;
         let itemsDefaultValue = undefined;
@@ -86,7 +151,7 @@
         if (!value || !value.push) value = [];
 
         if (this.schema.items && this.schema.items.default) {
-          itemsDefaultValue = this.schema.items.default;
+          itemsDefaultValue = cloneDeep(this.schema.items.default);
         }
 
         value.push(itemsDefaultValue);
@@ -96,10 +161,65 @@
       removeElement(index) {
         this.value.splice(index, 1);
       },
+      moveElementDown(index) {
+        let to = index + 1;
+        if(to >= this.value.length) {
+          to = 0;
+        }
+        this.value.splice(to,0,this.value.splice(index,1)[0]);
+      },
+      moveElementUp(index) {
+        let to = index - 1;
+        if(to < 0) {
+          to = this.value.length;
+        }
+        this.value.splice(to,0,this.value.splice(index,1)[0]);
+      },
       getFieldType(fieldSchema) {
         return "field-" + fieldSchema.type;
       },
-      modelUpdated() {}
+      modelUpdated() {},
+      validate(calledParent) {
+        this.clearValidationErrors();
+        let validateAsync = objGet(this.formOptions, "validateAsync", false);
+        let results = [];
+
+        forEach(this.$children, (child) => {
+          if (isFunction(child.validate)) {
+              results.push(child.validate(true));
+          }
+        });
+
+        let handleErrors = (errors) => {
+          let fieldErrors = [];
+          let errorPrepend = "["+(this.schema.label?this.schema.label:this.schema.name)+"] ";
+          forEach(errors, (err) => {
+            if(isArray(err) && err.length > 0) {
+                forEach(err, (singleErr) => {
+                    fieldErrors.push(errorPrepend+singleErr);
+                });
+            } else if(isString(err)) {
+                fieldErrors.push(errorPrepend+err);
+            }
+          });
+          if (isFunction(this.schema.onValidated)) {
+            this.schema.onValidated.call(this, this.model, fieldErrors, this.schema);
+          }
+
+          let isValid = fieldErrors.length == 0;
+          if (!calledParent) {
+            this.$emit("validated", isValid, fieldErrors, this);
+          }
+          this.errors = fieldErrors;
+          return fieldErrors;
+        };
+
+        if(!validateAsync) {
+          return handleErrors(results);
+        }
+
+        return Promise.all(results).then(handleErrors);
+      }
     }
   };
 </script>
