@@ -150,6 +150,108 @@
 }
 ```
 
+### With bootstrap 4 container component, object as array item, validation and inputName
+```
+model: {
+  columns: {}
+},
+schema: {
+  fields:[
+    {
+      type: "array",
+      label: 'Columns',
+      model: 'columns',
+      inputName: "columns",
+      showRemoveButton: false,
+      newElementButtonLabelClasses: "btn btn-outline-dark mt-2",
+      itemContainerComponent: "field-array-bootstrap-accordion-item",
+      newElementButtonLabel: "+ Add Column",
+      itemContainerHeader: function(model, schema, index) {
+        return "Column " + (index + 1) + (model && model.label ? " (" + model.label + ")": "");
+      },
+      items:{
+        type: 'object',
+        schema: {
+          fields: [
+              {
+                  type: "input",
+                  inputType: "text",
+                  label: "Name",
+                  model: "name",
+                  inputName: "name",
+                  required: true,
+                  validator: "string",
+              },
+              {
+                  type: "input",
+                  inputType: "text",
+                  label: "Description",
+                  model: "description",
+                  inputName: "description",
+                  validator: "string"
+              },
+              {
+                  type: "select",
+                  label: "Field Type",
+                  model: "type",
+                  inputName: "type",
+                  required: true,
+                  validator: "string",
+                  values: [
+                      {id: "string", name: "Text Field"},
+                      {id: "text", name: "Text Area"},
+                      {id: "number", name: "Number"},
+                      {id: "date", name: "Date"},
+                      {id: "select", name: "Single selection"},
+                      {id: "multiselect", name: "Multiple Selection"},
+                      {id: "boolean", name: "True/False"}
+                  ]
+              },
+              {
+                  type: "array",
+                  label: "Values",
+                  model: "values",
+                  inputName: "values",
+                  validator: "array",
+                  showRemoveButton: true,
+                  showModeElementUpButton: true,
+                  showModeElementDownButton: true,
+                  itemFieldClasses: "form-control",
+                  itemContainerClasses: "input-group pb-2",
+                  newElementButtonLabelClasses: "btn btn-outline-dark",
+                  removeElementButtonClasses: "btn btn-danger input-group-append",
+                  moveElementUpButtonClasses: "btn btn-outline-dark input-group-append",
+                  moveElementDownButtonClasses: "btn btn-outline-dark input-group-append",
+                  newElementButtonLabel: "+ Add Value",
+                  visible: function(model) {
+                      return model && (model.type === "select" || model.type === "multiselect");
+                  },
+                  required: function(model) {
+                      return model && (model.type === "select" || model.type === "multiselect");
+                  }
+              },
+              {
+                  type: "input",
+                  inputType: "number",
+                  label: "Rows (optional)",
+                  model: "rows",
+                  inputName: "rows",
+                  validator: "integer",
+                  visible: function(model) {
+                      return model && model.type === "text";
+                  }
+              }
+            ]
+        }
+      }
+    }
+  ]
+
+},
+formOptions: {
+  validateAfterChanged: true
+}
+```
 
 ## Installation
 ```
