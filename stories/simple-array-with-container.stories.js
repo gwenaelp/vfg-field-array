@@ -5,7 +5,7 @@ import Vue from "vue";
 Vue.component("Container", Container);
 
 // Add more stories here to live develop your components
-storiesOf("FieldArray", module).add("Simple array with container", () => {
+storiesOf("2- Containers", module).add("Simple array with container", () => {
   return {
     data: function() {
       return {

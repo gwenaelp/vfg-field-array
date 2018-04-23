@@ -81,47 +81,59 @@
 
 <script>
   import VueFormGenerator from "vue-form-generator";
-  import { forEach, cloneDeep, get as objGet, isFunction, isArray, isString } from "lodash";
+  import {
+    forEach,
+    cloneDeep,
+    get as objGet,
+    isFunction,
+    isArray,
+    isString
+  } from "lodash";
   import Vue from "vue";
 
   export default {
     mixins: [VueFormGenerator.abstractField],
     computed: {
-       fieldId() {
-         return this.getFieldID(this.schema);
-       },
-       newElementButtonLabel() {
-         if(typeof this.schema.newElementButtonLabel !== "undefined") {
-           return this.schema.newElementButtonLabel;
-         }
+      fieldId() {
+        return this.getFieldID(this.schema);
+      },
+      newElementButtonLabel() {
+        if (typeof this.schema.newElementButtonLabel !== "undefined") {
+          return this.schema.newElementButtonLabel;
+        }
 
-         return "+ New";
-       },
-       removeElementButtonLabel() {
-         if(typeof this.schema.removeElementButtonLabel !== "undefined") {
-           return this.schema.removeElementButtonLabel;
-         }
+        return "+ New";
+      },
+      removeElementButtonLabel() {
+        if (typeof this.schema.removeElementButtonLabel !== "undefined") {
+          return this.schema.removeElementButtonLabel;
+        }
 
-         return "x";
-       },
-       moveElementUpButtonLabel() {
-         if(typeof this.schema.moveElementUpButtonLabel !== "undefined") {removeElementButtonLabel()
-           return this.schema.moveElementUpButtonLabel;
-         }
+        return "x";
+      },
+      moveElementUpButtonLabel() {
+        if (typeof this.schema.moveElementUpButtonLabel !== "undefined") {
+          removeElementButtonLabel();
+          return this.schema.moveElementUpButtonLabel;
+        }
 
-         return "↑";
-       },
-       moveElementDownButtonLabel() {
-         if(typeof this.schema.moveElementDownButtonLabel !== "undefined") {
-           return this.schema.moveElementDownButtonLabel;
-         }
+        return "↑";
+      },
+      moveElementDownButtonLabel() {
+        if (typeof this.schema.moveElementDownButtonLabel !== "undefined") {
+          return this.schema.moveElementDownButtonLabel;
+        }
 
-         return "↓";
-       }
+        return "↓";
+      }
     },
     methods: {
       generateSchema(rootValue, schema, index) {
-        if(typeof this.schema.inputName !== "undefined") {
+        if (!schema) {
+          schema = {};
+        }
+
+        if (typeof this.schema.inputName !== "undefined") {
           schema.inputName = this.schema.inputName + "[" + index + "]";
         }
 
@@ -137,12 +149,12 @@
           }
         };
       },
-      generateInputName(index){
-          if(typeof this.schema.inputName === "undefined") {
-            return null;
-          }
+      generateInputName(index) {
+        if (typeof this.schema.inputName === "undefined") {
+          return null;
+        }
 
-          return this.schema.inputName + "[" + index + "]";
+        return this.schema.inputName + "[" + index + "]";
       },
       newElement() {
         let value = this.value;
@@ -163,17 +175,17 @@
       },
       moveElementDown(index) {
         let to = index + 1;
-        if(to >= this.value.length) {
+        if (to >= this.value.length) {
           to = 0;
         }
-        this.value.splice(to,0,this.value.splice(index,1)[0]);
+        this.value.splice(to, 0, this.value.splice(index, 1)[0]);
       },
       moveElementUp(index) {
         let to = index - 1;
-        if(to < 0) {
+        if (to < 0) {
           to = this.value.length;
         }
-        this.value.splice(to,0,this.value.splice(index,1)[0]);
+        this.value.splice(to, 0, this.value.splice(index, 1)[0]);
       },
       getFieldType(fieldSchema) {
         return "field-" + fieldSchema.type;
@@ -184,26 +196,34 @@
         let validateAsync = objGet(this.formOptions, "validateAsync", false);
         let results = [];
 
-        forEach(this.$children, (child) => {
+        forEach(this.$children, child => {
           if (isFunction(child.validate)) {
-              results.push(child.validate(true));
+            results.push(child.validate(true));
           }
         });
 
-        let handleErrors = (errors) => {
+        let handleErrors = errors => {
           let fieldErrors = [];
-          let errorPrepend = "["+(this.schema.label?this.schema.label:this.schema.name)+"] ";
-          forEach(errors, (err) => {
-            if(isArray(err) && err.length > 0) {
-                forEach(err, (singleErr) => {
-                    fieldErrors.push(errorPrepend+singleErr);
-                });
-            } else if(isString(err)) {
-                fieldErrors.push(errorPrepend+err);
+          let errorPrepend =
+            "[" +
+            (this.schema.label ? this.schema.label : this.schema.name) +
+            "] ";
+          forEach(errors, err => {
+            if (isArray(err) && err.length > 0) {
+              forEach(err, singleErr => {
+                fieldErrors.push(errorPrepend + singleErr);
+              });
+            } else if (isString(err)) {
+              fieldErrors.push(errorPrepend + err);
             }
           });
           if (isFunction(this.schema.onValidated)) {
-            this.schema.onValidated.call(this, this.model, fieldErrors, this.schema);
+            this.schema.onValidated.call(
+              this,
+              this.model,
+              fieldErrors,
+              this.schema
+            );
           }
 
           let isValid = fieldErrors.length == 0;
@@ -214,7 +234,7 @@
           return fieldErrors;
         };
 
-        if(!validateAsync) {
+        if (!validateAsync) {
           return handleErrors(results);
         }
 

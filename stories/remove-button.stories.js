@@ -1,7 +1,7 @@
 import { storiesOf } from "@storybook/vue";
 
 // Add more stories here to live develop your components
-storiesOf("FieldArray", module).add("Remove button", () => {
+storiesOf("1- FieldArray", module).add("Remove button", () => {
   return {
     data: function() {
       return {

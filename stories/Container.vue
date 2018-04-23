@@ -5,6 +5,12 @@
         <a @click="contentVisible = !contentVisible">
           {{contentVisible ? "-" : "+"}} Container ({{model}})
         </a>
+        <a @click="$emit('moveItemUp')">
+          ↑
+        </a>
+        <a @click="$emit('moveItemDown')">
+          ↓
+        </a>
         <a @click="$emit('removeItem')">
           X
         </a>
