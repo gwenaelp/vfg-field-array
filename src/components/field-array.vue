@@ -81,14 +81,12 @@
 
 <script>
   import VueFormGenerator from "vue-form-generator";
-  import {
-    forEach,
-    cloneDeep,
-    get as objGet,
-    isFunction,
-    isArray,
-    isString
-  } from "lodash";
+  import isFunction from 'lodash.isfunction';
+  import isArray from 'lodash.isarray';
+  import isString from 'lodash.isstring';
+
+  import forEach from 'lodash.foreach';
+  import cloneDeep from 'lodash.clonedeep';
   import Vue from "vue";
 
   export default {
@@ -193,7 +191,7 @@
       modelUpdated() {},
       validate(calledParent) {
         this.clearValidationErrors();
-        let validateAsync = objGet(this.formOptions, "validateAsync", false);
+        let validateAsync = this.formOptions.validateAsync || false;
         let results = [];
 
         forEach(this.$children, child => {
