@@ -19,7 +19,7 @@
 
 ![Simple](https://github.com/gwenaelp/vfg-field-array/blob/master/docs/preview-simple.png)
 
-```
+```javascript
 {
   model: {
     array: ["item1", "item2", "item3"]
@@ -41,7 +41,7 @@
 
 ![With container](https://github.com/gwenaelp/vfg-field-array/blob/master/docs/preview-container.png)
 
-```
+```javascript
 {
   model: {
     array: ["item1", "item2", "item3"]
@@ -60,7 +60,8 @@
 ```
 
 #### Container.vue
-```
+
+```html
 <template>
   <div>
     <div>
@@ -100,7 +101,7 @@
 
 ![With container and object](https://github.com/gwenaelp/vfg-field-array/blob/master/docs/preview-container-object.png)
 
-```
+```javascript
 {
   model: {
     columns: [{
@@ -151,7 +152,8 @@
 ```
 
 ### With bootstrap 4 container component, object as array item, validation and inputName
-```
+
+```javascript
 model: {
   columns: {}
 },
@@ -254,15 +256,18 @@ formOptions: {
 ```
 
 ## Installation
-```
+
+```shell
 npm install vfg-field-array
 ```
-vfg-field-array can be used as a module in both CommonJS and ES modular environments.
+
+`vfg-field-array` can be used as a module in both CommonJS and ES modular environments.
 
 When in non-modular environment, vfg-field-array will register all the components to vue by itself.</p>
 
 ### ES6
-```js
+
+```javascript
 //
 // You can register a component manually
 //
@@ -286,7 +291,8 @@ Vue.use(ModuleLibrary);
 ```
 
 ### CommonJS
-```js
+
+```javascript
 //
 // You can register a component manually
 //
@@ -321,7 +327,7 @@ Vue.use(ModuleLibrary);
 
 ### After that, you can use it with Vue Form Generator:
 
-```json
+```javascript
   schema: {
     fields: [
       {
