@@ -127,18 +127,16 @@
     },
     methods: {
       generateSchema(rootValue, schema, index) {
-        if (!schema) {
-          schema = {};
-        }
+        let newSchema = {...schema};
 
         if (typeof this.schema.inputName !== "undefined") {
-          schema.inputName = this.schema.inputName + "[" + index + "]";
+          newSchema.inputName = this.schema.inputName + "[" + index + "]";
         }
 
-        schema.id = this.fieldId + index;
+        newSchema.id = this.fieldId + index;
 
         return {
-          ...schema,
+          ...newSchema,
           set(model, value) {
             Vue.set(rootValue, index, value);
           },
