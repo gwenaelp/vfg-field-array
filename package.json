@@ -45,6 +45,7 @@
     "lint": "eslint --ext .js,.vue .",
     "lint:fix": "eslint --ext .js,.vue . --fix",
     "prepublishOnly": "npm run build",
+    "prepare": "npm run build",
     "semantic-release": "semantic-release"
   },
   "devDependencies": {
