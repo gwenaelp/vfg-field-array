@@ -81,12 +81,12 @@
 
 <script>
   import VueFormGenerator from "vue-form-generator";
-  import isFunction from 'lodash.isfunction';
-  import isArray from 'lodash.isarray';
-  import isString from 'lodash.isstring';
+  import isFunction from "lodash.isfunction";
+  import isArray from "lodash.isarray";
+  import isString from "lodash.isstring";
 
-  import forEach from 'lodash.foreach';
-  import cloneDeep from 'lodash.clonedeep';
+  import forEach from "lodash.foreach";
+  import cloneDeep from "lodash.clonedeep";
   import Vue from "vue";
 
   export default {
@@ -127,7 +127,7 @@
     },
     methods: {
       generateSchema(rootValue, schema, index) {
-        let newSchema = {...schema};
+        let newSchema = { ...schema };
 
         if (typeof this.schema.inputName !== "undefined") {
           newSchema.inputName = this.schema.inputName + "[" + index + "]";
@@ -186,7 +186,9 @@
       getFieldType(fieldSchema) {
         return "field-" + fieldSchema.type;
       },
-      modelUpdated() {},
+      modelUpdated(model, schema) {
+        this.$emit("model-updated", model, schema);
+      },
       validate(calledParent) {
         this.clearValidationErrors();
         let validateAsync = this.formOptions.validateAsync || false;
