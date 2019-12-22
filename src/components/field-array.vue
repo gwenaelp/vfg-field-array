@@ -75,22 +75,34 @@
         @click="removeElement(index)"
         v-if='schema.showRemoveButton'/>
     </div>
-    <input type="button" :value="newElementButtonLabel" :class="schema.newElementButtonLabelClasses" @click="newElement"/>
+    <component
+      v-if="schema.showEmptyComponentAtBottom"
+      :is='getFieldType(schema.items)'
+      :model='newItem'
+      :schema='generateSchema(this, schema.items, "newItem")'
+      :formOptions='formOptions'
+      @model-updated='emptyComponentModelUpdated'/>
+    <input v-if="!schema.hideAddButton" type="button" :value="newElementButtonLabel" :class="schema.newElementButtonLabelClasses" @click="newElement"/>
   </div>
 </template>
 
 <script>
   import VueFormGenerator from "vue-form-generator";
-  import isFunction from 'lodash.isfunction';
-  import isArray from 'lodash.isarray';
-  import isString from 'lodash.isstring';
+  import isFunction from "lodash.isfunction";
+  import isArray from "lodash.isarray";
+  import isString from "lodash.isstring";
 
-  import forEach from 'lodash.foreach';
-  import cloneDeep from 'lodash.clonedeep';
+  import forEach from "lodash.foreach";
+  import cloneDeep from "lodash.clonedeep";
   import Vue from "vue";
 
   export default {
     mixins: [VueFormGenerator.abstractField],
+    data() {
+      return {
+        newItem: undefined
+      };
+    },
     computed: {
       fieldId() {
         return this.getFieldID(this.schema);
@@ -125,9 +137,32 @@
         return "↓";
       }
     },
+    watch: {
+      value: {
+        handler(v) {
+          if (
+            this.schema.removeUndefinedValues &&
+            v !== undefined &&
+            (v.indexOf(undefined) !== -1 || v.indexOf(null) !== -1)
+          ) {
+            const newValue = [...v];
+            let index;
+            console.log(newValue.indexOf(undefined), newValue.indexOf(null));
+            while (newValue.indexOf(undefined) !== -1) {
+              newValue.splice(newValue.indexOf(undefined), 1);
+            }
+            while (newValue.indexOf(null) !== -1) {
+              newValue.splice(newValue.indexOf(null), 1);
+            }
+            this.value = newValue;
+          }
+        },
+        deep: true
+      }
+    },
     methods: {
       generateSchema(rootValue, schema, index) {
-        let newSchema = {...schema};
+        let newSchema = { ...schema };
 
         if (typeof this.schema.inputName !== "undefined") {
           newSchema.inputName = this.schema.inputName + "[" + index + "]";
@@ -151,6 +186,10 @@
         }
 
         return this.schema.inputName + "[" + index + "]";
+      },
+      emptyComponentModelUpdated(e) {
+        this.value.push(e);
+        this.newItem = undefined;
       },
       newElement() {
         let value = this.value;
