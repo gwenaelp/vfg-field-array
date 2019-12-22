@@ -188,6 +188,9 @@
         return this.schema.inputName + "[" + index + "]";
       },
       emptyComponentModelUpdated(e) {
+        if (!this.value) {
+          this.value = [];
+        }
         this.value.push(e);
         this.newItem = undefined;
       },
