@@ -13,6 +13,7 @@
           :moveElementDownButtonLabel="moveElementDownButtonLabel"
           :itemContainerHeader="schema.itemContainerHeader"
           :schema='generateSchema(value, schema.items, index)'
+          :vfg='vfg'
           @moveItemUp="moveElementUp(index)"
           @moveItemDown="moveElementDown(index)"
           @removeItem='removeElement(index)'>
@@ -20,6 +21,7 @@
             :is='getFieldType(schema.items)'
             :model='item'
             :schema='generateSchema(value, schema.items, index)'
+            :vfg='vfg'
             :formOptions='formOptions'
             @model-updated='modelUpdated'/>
         </component>
@@ -29,6 +31,7 @@
           :is='getFieldType(schema.items)'
           :model='item'
           :schema='generateSchema(value, schema.items, index)'
+          :vfg='vfg'
           :formOptions='formOptions'
           @model-updated='modelUpdated'/>
       </span>
@@ -44,6 +47,7 @@
           :moveElementDownButtonLabel="moveElementDownButtonLabel"
           :itemContainerHeader="schema.itemContainerHeader"
           :schema='generateSchema(value, schema.items, index)'
+          :vfg='vfg'
           @moveItemUp="moveElementUp(index)"
           @moveItemDown="moveElementDown(index)"
           @removeItem='removeElement(index)'>
@@ -80,6 +84,7 @@
       :is='getFieldType(schema.items)'
       :model='newItem'
       :schema='generateSchema(this, schema.items, "newItem")'
+      :vfg='vfg'
       :formOptions='formOptions'
       @model-updated='emptyComponentModelUpdated'/>
     <input v-if="!schema.hideAddButton" type="button" :value="newElementButtonLabel" :class="schema.newElementButtonLabelClasses" @click="newElement"/>
