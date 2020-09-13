@@ -228,7 +228,9 @@
       getFieldType(fieldSchema) {
         return "field-" + fieldSchema.type;
       },
-      modelUpdated() {},
+      modelUpdated(model, schema) {
+        this.$emit("model-updated", model, schema);
+      },
       validate(calledParent) {
         this.clearValidationErrors();
         let validateAsync = this.formOptions.validateAsync || false;
