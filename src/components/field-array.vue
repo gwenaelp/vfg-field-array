@@ -1,5 +1,5 @@
 <template>
-  <div :id="fieldId" :class="schema.fieldClasses" v-if="schema">
+  <div :id="fieldId" v-attributes="schema.attributes" :class="schema.fieldClasses" v-if="schema">
     <div v-for="(item, index) in value" :class="schema.itemContainerClasses">
       <span v-if="schema.items && schema.itemContainerComponent">
         <component
