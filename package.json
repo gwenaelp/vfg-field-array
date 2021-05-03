@@ -1,7 +1,7 @@
 {
   "name": "vfg-field-array",
   "description": "A vue-form-generator field to handle arrays",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "main": "dist/vfg-field-array.common.js",
   "module": "dist/vfg-field-array.esm.js",
@@ -130,6 +130,7 @@
     "lodash.isarray": "^4.0.0",
     "lodash.isfunction": "^3.0.9",
     "lodash.isstring": "^4.0.1",
-    "vue-form-generator": "^2.2.1"
+    "vue-form-generator": "^2.2.1",
+    "vuedraggable": "^2.24.3"
   }
 }

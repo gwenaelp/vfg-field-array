@@ -1,80 +1,82 @@
 <template>
   <div :id="fieldId" v-attributes="schema.attributes" :class="schema.fieldClasses" v-if="schema">
-    <div v-for="(item, index) in value" :class="schema.itemContainerClasses">
-      <span v-if="schema.items && schema.itemContainerComponent">
-        <component
-          :is='schema.itemContainerComponent'
-          :model='item'
-          :index="index"
-          :id="fieldId + 'c' + index"
-          :parentId="fieldId"
-          :removeElementButtonLabel="removeElementButtonLabel"
-          :moveElementUpButtonLabel="moveElementUpButtonLabel"
-          :moveElementDownButtonLabel="moveElementDownButtonLabel"
-          :itemContainerHeader="schema.itemContainerHeader"
-          :schema='generateSchema(value, schema.items, index)'
-          @moveItemUp="moveElementUp(index)"
-          @moveItemDown="moveElementDown(index)"
-          @removeItem='removeElement(index)'>
+    <component :is="schema.draggable ? 'draggable' : 'span'" handle="array-item-handle">
+      <div v-for="(item, index) in value" :class="schema.itemContainerClasses">
+        <span v-if="schema.items && schema.itemContainerComponent">
+          <component
+            :is='schema.itemContainerComponent'
+            :model='item'
+            :index="index"
+            :id="fieldId + 'c' + index"
+            :parentId="fieldId"
+            :removeElementButtonLabel="removeElementButtonLabel"
+            :moveElementUpButtonLabel="moveElementUpButtonLabel"
+            :moveElementDownButtonLabel="moveElementDownButtonLabel"
+            :itemContainerHeader="schema.itemContainerHeader"
+            :schema='generateSchema(value, schema.items, index)'
+            @moveItemUp="moveElementUp(index)"
+            @moveItemDown="moveElementDown(index)"
+            @removeItem='removeElement(index)'>
+            <component
+              :is='getFieldType(schema.items)'
+              :model='item'
+              :schema='generateSchema(value, schema.items, index)'
+              :formOptions='formOptions'
+              @model-updated='modelUpdated'/>
+          </component>
+        </span>
+        <span v-else-if="schema.items">
           <component
             :is='getFieldType(schema.items)'
             :model='item'
             :schema='generateSchema(value, schema.items, index)'
             :formOptions='formOptions'
             @model-updated='modelUpdated'/>
-        </component>
-      </span>
-      <span v-else-if="schema.items">
-        <component
-          :is='getFieldType(schema.items)'
-          :model='item'
-          :schema='generateSchema(value, schema.items, index)'
-          :formOptions='formOptions'
-          @model-updated='modelUpdated'/>
-      </span>
-      <span v-else-if="schema.itemContainerComponent">
-        <component
-          :is='schema.itemContainerComponent'
-          :model='item'
-          :index="index"
-          :id="fieldId + 'c' + index"
-          :parentId="fieldId"
-          :removeElementButtonLabel="removeElementButtonLabel"
-          :moveElementUpButtonLabel="moveElementUpButtonLabel"
-          :moveElementDownButtonLabel="moveElementDownButtonLabel"
-          :itemContainerHeader="schema.itemContainerHeader"
-          :schema='generateSchema(value, schema.items, index)'
-          @moveItemUp="moveElementUp(index)"
-          @moveItemDown="moveElementDown(index)"
-          @removeItem='removeElement(index)'>
-          <input type="text" v-model="value[index]" :class="schema.itemFieldClasses" :name='generateInputName(index)' :id="fieldId + index" />
-          <input
-            type="button"
-            :value="removeElementButtonLabel"
-            @click="removeElement(index)"
-            v-if='schema.showRemoveButton'/>
-        </component>
-      </span>
-      <input type="text" v-model="value[index]" :class="schema.itemFieldClasses" :name='generateInputName(index)' :id="fieldId + index" v-else/>
-      <input
-        type="button"
-        :value="moveElementUpButtonLabel"
-        :class="schema.moveElementUpButtonClasses"
-        @click="moveElementUp(index)"
-        v-if='schema.showModeElementUpButton'/>
-      <input
-        type="button"
-        :value="moveElementDownButtonLabel"
-        :class="schema.moveElementDownButtonClasses"
-        @click="moveElementDown(index)"
-        v-if='schema.showModeElementDownButton'/>
-      <input
-        type="button"
-        :value="removeElementButtonLabel"
-        :class="schema.removeElementButtonClasses"
-        @click="removeElement(index)"
-        v-if='schema.showRemoveButton'/>
-    </div>
+        </span>
+        <span v-else-if="schema.itemContainerComponent">
+          <component
+            :is='schema.itemContainerComponent'
+            :model='item'
+            :index="index"
+            :id="fieldId + 'c' + index"
+            :parentId="fieldId"
+            :removeElementButtonLabel="removeElementButtonLabel"
+            :moveElementUpButtonLabel="moveElementUpButtonLabel"
+            :moveElementDownButtonLabel="moveElementDownButtonLabel"
+            :itemContainerHeader="schema.itemContainerHeader"
+            :schema='generateSchema(value, schema.items, index)'
+            @moveItemUp="moveElementUp(index)"
+            @moveItemDown="moveElementDown(index)"
+            @removeItem='removeElement(index)'>
+            <input type="text" v-model="value[index]" :class="schema.itemFieldClasses" :name='generateInputName(index)' :id="fieldId + index" />
+            <input
+              type="button"
+              :value="removeElementButtonLabel"
+              @click="removeElement(index)"
+              v-if='schema.showRemoveButton'/>
+          </component>
+        </span>
+        <input type="text" v-model="value[index]" :class="schema.itemFieldClasses" :name='generateInputName(index)' :id="fieldId + index" v-else/>
+        <input
+          type="button"
+          :value="moveElementUpButtonLabel"
+          :class="schema.moveElementUpButtonClasses"
+          @click="moveElementUp(index)"
+          v-if='schema.showModeElementUpButton'/>
+        <input
+          type="button"
+          :value="moveElementDownButtonLabel"
+          :class="schema.moveElementDownButtonClasses"
+          @click="moveElementDown(index)"
+          v-if='schema.showModeElementDownButton'/>
+        <input
+          type="button"
+          :value="removeElementButtonLabel"
+          :class="schema.removeElementButtonClasses"
+          @click="removeElement(index)"
+          v-if='schema.showRemoveButton'/>
+      </div>
+    </component>
     <component
       v-if="schema.showEmptyComponentAtBottom"
       :is='getFieldType(schema.items)'
@@ -88,16 +90,15 @@
 
 <script>
   import VueFormGenerator from "vue-form-generator";
-  import isFunction from "lodash.isfunction";
-  import isArray from "lodash.isarray";
-  import isString from "lodash.isstring";
+  import draggable from 'vuedraggable';
 
   import forEach from "lodash.foreach";
-  import cloneDeep from "lodash.clonedeep";
-  import Vue from "vue";
 
   export default {
     mixins: [VueFormGenerator.abstractField],
+    components: {
+      draggable,
+    },
     data() {
       return {
         newItem: undefined
@@ -172,8 +173,8 @@
 
         return {
           ...newSchema,
-          set(model, value) {
-            Vue.set(rootValue, index, value);
+          set (model, value) {
+            rootValue[index] = value;
           },
           get(model) {
             return rootValue[index];
@@ -201,7 +202,7 @@
         if (!value || !value.push) value = [];
 
         if (this.schema.items && this.schema.items.default) {
-          itemsDefaultValue = cloneDeep(this.schema.items.default);
+          itemsDefaultValue = JSON.parse(JSON.stringify(this.schema.items.default));
         }
 
         value.push(itemsDefaultValue);
@@ -235,7 +236,7 @@
         let results = [];
 
         forEach(this.$children, child => {
-          if (isFunction(child.validate)) {
+          if (child.validate && typeof child.validate === 'function') {
             results.push(child.validate(true));
           }
         });
@@ -247,15 +248,15 @@
             (this.schema.label ? this.schema.label : this.schema.name) +
             "] ";
           forEach(errors, err => {
-            if (isArray(err) && err.length > 0) {
+            if (Array.isArray(err) && err.length > 0) {
               forEach(err, singleErr => {
                 fieldErrors.push(errorPrepend + singleErr);
               });
-            } else if (isString(err)) {
+            } else if (typeof err === 'string') {
               fieldErrors.push(errorPrepend + err);
             }
           });
-          if (isFunction(this.schema.onValidated)) {
+          if (this.schema.onValidated && typeof this.schema.onValidated === 'function') {
             this.schema.onValidated.call(
               this,
               this.model,

@@ -29,6 +29,11 @@ const builds = {
   // (CommonJS). Used by bundlers e.g. Webpack & Browserify
   cjs: {
     entry: "src/index.js",
+    ignore: [
+      'vue',
+      'vue-form-generator',
+      'lodash.foreach'
+    ],
     dest: `dist/${projectName}.common.js`,
     format: "cjs"
   },
@@ -36,6 +41,11 @@ const builds = {
   // e.g. Rollup & Webpack 2
   esm: {
     entry: "src/index.js",
+    ignore: [
+      'vue',
+      'vue-form-generator',
+      'lodash.foreach'
+    ],
     dest: `dist/${projectName}.esm.js`,
     format: "es"
   },
@@ -43,6 +53,11 @@ const builds = {
   "umd-dev": {
     entry: "src/index.umd.js",
     dest: `dist/${projectName}.js`,
+    ignore: [
+      'vue',
+      'vue-form-generator',
+      'lodash.foreach'
+    ],
     format: "umd",
     env: "development"
   },
@@ -50,6 +65,11 @@ const builds = {
   "umd-prod": {
     entry: "src/index.umd.js",
     dest: `dist/${projectName}.min.js`,
+    ignore: [
+      'vue',
+      'vue-form-generator',
+      'lodash.foreach'
+    ],
     format: "umd",
     env: "production"
   }
@@ -59,7 +79,8 @@ function genConfig(name) {
   const opts = builds[name];
   const config = {
     input: opts.entry,
-    external: id => pack.dependencies && pack.dependencies[id], // exclude dependencies from build
+    external: ['vue', 'vue-form-generator', 'lodash.foreach'],
+    globals: { vue: 'Vue' },
     plugins: [
       resolve({
         browser: true,
@@ -118,4 +139,5 @@ function genConfig(name) {
 }
 
 const target = process.env.TARGET || "umd-prod";
+console.log(genConfig(target));
 module.exports = genConfig(target);
