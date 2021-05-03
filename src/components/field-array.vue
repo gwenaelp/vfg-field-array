@@ -1,6 +1,6 @@
 <template>
   <div :id="fieldId" v-attributes="schema.attributes" :class="schema.fieldClasses" v-if="schema">
-    <component :is="schema.draggable ? 'draggable' : 'span'" handle="array-item-handle">
+    <component :is="schema.draggable ? 'draggable' : 'span'" v-model="value" class="wrap" handle=".array-item-handle">
       <div v-for="(item, index) in value" :class="schema.itemContainerClasses">
         <span v-if="schema.items && schema.itemContainerComponent">
           <component
@@ -90,14 +90,14 @@
 
 <script>
   import VueFormGenerator from "vue-form-generator";
-  import draggable from 'vuedraggable';
+  import draggable from "vuedraggable";
 
   import forEach from "lodash.foreach";
 
   export default {
     mixins: [VueFormGenerator.abstractField],
     components: {
-      draggable,
+      draggable
     },
     data() {
       return {
@@ -173,7 +173,7 @@
 
         return {
           ...newSchema,
-          set (model, value) {
+          set(model, value) {
             rootValue[index] = value;
           },
           get(model) {
@@ -202,7 +202,9 @@
         if (!value || !value.push) value = [];
 
         if (this.schema.items && this.schema.items.default) {
-          itemsDefaultValue = JSON.parse(JSON.stringify(this.schema.items.default));
+          itemsDefaultValue = JSON.parse(
+            JSON.stringify(this.schema.items.default)
+          );
         }
 
         value.push(itemsDefaultValue);
@@ -236,7 +238,7 @@
         let results = [];
 
         forEach(this.$children, child => {
-          if (child.validate && typeof child.validate === 'function') {
+          if (child.validate && typeof child.validate === "function") {
             results.push(child.validate(true));
           }
         });
@@ -252,11 +254,14 @@
               forEach(err, singleErr => {
                 fieldErrors.push(errorPrepend + singleErr);
               });
-            } else if (typeof err === 'string') {
+            } else if (typeof err === "string") {
               fieldErrors.push(errorPrepend + err);
             }
           });
-          if (this.schema.onValidated && typeof this.schema.onValidated === 'function') {
+          if (
+            this.schema.onValidated &&
+            typeof this.schema.onValidated === "function"
+          ) {
             this.schema.onValidated.call(
               this,
               this.model,
