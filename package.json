@@ -1,7 +1,7 @@
 {
   "name": "vfg-field-array",
   "description": "A vue-form-generator field to handle arrays",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "license": "MIT",
   "main": "dist/vfg-field-array.common.js",
   "module": "dist/vfg-field-array.esm.js",
